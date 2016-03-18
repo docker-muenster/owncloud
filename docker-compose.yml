@@ -1,0 +1,41 @@
+version: "2"
+services:
+  owncloud:
+    image: owncloud:9.0
+    entrypoint: /opt/owncloud-config-mixin/first-run.sh
+    environment:
+      - ADMIN_PASSWORD=password
+    ports:
+      - "80"
+    volumes_from:
+      - owncloud-config
+      - owncloud-data
+    links:
+      - mysql
+
+  owncloud-config:
+    image: dockermuenster/owncloud-config
+    volumes:
+      - owncloud-config:/var/www/html/config
+
+  owncloud-data:
+    image: alpine:3.3
+    entrypoint: /bin/true
+    volumes:
+      - owncloud-data:/var/www/html/data
+      - owncloud-apps:/var/www/html/apps
+
+  mysql:
+    image: mariadb:10.1
+    environment:
+      - MYSQL_ROOT_PASSWORD=password
+    volumes:
+      - owncloud-mysql:/var/lib/mysql
+
+  # caddy:
+
+volumes:
+  owncloud-config:
+  owncloud-data:
+  owncloud-apps:
+  owncloud-mysql:
